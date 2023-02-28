@@ -67,7 +67,7 @@ public class Matrix {
 	 * @post | getArrayOfArrays().length == getRowAmount()
 	 * @post | getArrayOfArrays()[0].length == getColumnAmount()
 	 */
-	public double[] getArrayOfArrays() {
+	public double[][] getArrayOfArrays() {
 		return TODO
 	}
 	
@@ -109,7 +109,7 @@ public class Matrix {
 	 * 		 | i -> result.getArrayRowMajorOrder[i] == 
 	 * 		 | this.getArrayRowMajorOrder[i] + matrixtoadd.getArrayRowMajorOrder[i])
 	 */
-	public Matrix plus(double[] matrixtoadd) {
+	public Matrix plus(Matrix matrixtoadd) {
 		return TODO
 	}
 }
