@@ -1,74 +1,102 @@
 package Matrix;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 /**
  * 
  * @immutable
- * @invar | getRowAmount() != null
- * @invar | getColumnAmount() != null
- * @invar | getElement(int row, int column) != null
  * @invar | getArrayRowMajorOrder() != null
  * @invar | getArrayColumnMajorOrder() != null
  * @invar | getArrayOfArrays() != null
+ * @invar | getRowAmount() >= 0
+ * @invar | getColumnAmount() >= 0
  */
 public class Matrix {
+	
+	
+	/**
+	 * @invar | matrixlist != null
+	 * @invar | matrixlist.length == amountofrows*amountofcolumns
+	 */
+	private double[] matrixlist;
+	private int amountofrows;
+	private int amountofcolumns;
+	
 
 	/**
 	 * @inspects | this
 	 */
 	public int getRowAmount() {
-		return TODO
+		return amountofrows;
 	}
 	
 	/**
 	 * @inspects | this
 	 */
 	public int getColumnAmount() {
-		return TODO
+		return amountofcolumns;
 	}
 	
 	/**
 	 * @inspects | this
-	 * @pre | row < getRowAmount()
-	 * @pre | column < getColumnAmount()
+	 * @pre | row < getRowAmount() && row >= 0
+	 * @pre | column < getColumnAmount() && column >= 0
 	 * @post | result == getArrayOfArrays()[row][column]
 	 * 
 	 */
 	public double getElement(int row, int column) {
-		return TODO
+		return matrixlist[row*amountofcolumns + column];
 	}
 	
 	/**
 	 * @creates | result
 	 * @inspects | this
-	 * @post | getArrayRowMajorOrder().length == getColumnAmount()*getRowAmount()
-	 * @post | IntStream.range(0, getArrayOfArrays().length).allMatch(i ->
-	 * 		 | IntStream.range(0, getArrayOfArrays()[0].length).allMatch(j ->
-	 * 		 | getArrayOfArrays()[i][j] == getArrayRowMajorOrder()[i*getColumnAmount() + j]))
+	 * @post | result != null
+	 * @post | result.length == getColumnAmount()*getRowAmount()
+	 * @post | 	IntStream.range(0, getRowAmount()).allMatch(i ->
+	 * 		 | 	IntStream.range(0, getColumnAmount()).allMatch(j ->
+	 * 		 | 	getArrayOfArrays()[i][j] == result[i*getColumnAmount() + j]))
 	 */
 	public double[] getArrayRowMajorOrder() {
-		return TODO
+		return matrixlist.clone();
 	}
 	
 	/**
 	 * @creates | result
 	 * @inspects | this
-	 * @post | getArrayColumnMajorOrder().length == getColumnAmount()*getRowAmount()
+	 * @post | result.length == getColumnAmount()*getRowAmount()
 	 * @post | IntStream.range(0, getArrayOfArrays().length).allMatch(i ->
 	 * 		 | IntStream.range(0, getArrayOfArrays()[0].length).allMatch(j ->
-	 * 		 | getArrayOfArrays()[i][j] == getArrayRowMajorOrder()[j*getRowAmount() + i]))
+	 * 		 | getArrayOfArrays()[i][j] == result[j*getRowAmount() + i]))
 	 */
 	public double[] getArrayColumnMajorOrder() {
-		return TODO
+		double[] columnlist = new double[matrixlist.length];
+		int i = 0;
+		for(int column = 0; column < amountofcolumns;column++) {
+			for(int row = 0; row < amountofrows*amountofcolumns;row += amountofcolumns) {
+				columnlist[i] = matrixlist[column + row];
+				i++;
+			}
+		}
+		return columnlist;
 	}
 	
 	/**
 	 * @creates | result
 	 * @inspects | this
-	 * @post | getArrayOfArrays().length == getRowAmount()
-	 * @post | getArrayOfArrays()[0].length == getColumnAmount()
+	 * @post | result.length == getRowAmount()
+	 * @post | result[0].length == getColumnAmount()
 	 */
 	public double[][] getArrayOfArrays() {
-		return TODO
+		double[][] arraylist = new double[amountofrows][amountofcolumns];
+		for(int row = 0; row < amountofrows;row++) {
+			for(int column = 0; column < amountofcolumns;column++) {
+				arraylist[row][column] = matrixlist[row*amountofcolumns + column];
+			}
+		}
+		return arraylist;
 	}
 	
 	/**
@@ -79,9 +107,12 @@ public class Matrix {
 	 * @post | getRowAmount() == inputrowamount
 	 * @post | getColumnAmount() == inputcolumnamount
 	 * @post | inputmatrix.length == inputrowamount*inputcolumnamount
+	 * @post | Arrays.equals(inputmatrix, getArrayRowMajorOrder())
 	 */
 	public Matrix(int inputrowamount, int inputcolumnamount, double[] inputmatrix) {
-		return TODO
+		amountofrows = inputrowamount;
+		amountofcolumns = inputcolumnamount;
+		matrixlist = inputmatrix;
 	}
 	
 	/**
@@ -90,11 +121,16 @@ public class Matrix {
 	 * @post | result.getRowAmount() == this.getRowAmount()
 	 * @post | result.getColumnAmount() == this.getColumnAmount() 
 	 * @post | IntStream.range(0, getColumnAmount()*getRowAmount()).allMatch(
-	 * 		 | i -> result.getArrayRowMajorOrder[i] == 
-	 * 		 | scalar * this.getArrayRowMajorOrder[i]) 
+	 * 		 | i -> result.getArrayRowMajorOrder()[i] == 
+	 * 		 | scalar * this.getArrayRowMajorOrder()[i]) 
 	 */
 	public Matrix scaled(int scalar) {
-		return TODO
+		double[] copylist = matrixlist.clone();
+		for(int i = 0;i < matrixlist.length;i++) {
+			copylist[i] *= scalar;
+		}
+		Matrix copymatrix = new Matrix(amountofrows, amountofcolumns, copylist);
+		return copymatrix;
 	}
 	
 	/**
@@ -106,10 +142,15 @@ public class Matrix {
 	 * @post | result.getRowAmount() == this.getRowAmount()
 	 * @post | result.getColumnAmount() == this.getColumnAmount()
 	 * @post | IntStream.range(0, getColumnAmount()*getRowAmount()).allMatch(
-	 * 		 | i -> result.getArrayRowMajorOrder[i] == 
-	 * 		 | this.getArrayRowMajorOrder[i] + matrixtoadd.getArrayRowMajorOrder[i])
+	 * 		 | i -> result.getArrayRowMajorOrder()[i] == 
+	 * 		 | this.getArrayRowMajorOrder()[i] + matrixtoadd.getArrayRowMajorOrder()[i])
 	 */
 	public Matrix plus(Matrix matrixtoadd) {
-		return TODO
+		double[] copylist = matrixlist.clone();
+		for(int i = 0;i < matrixlist.length;i++) {
+			copylist[i] += matrixtoadd.getArrayRowMajorOrder()[i]; 
+		}
+		Matrix copymatrix = new Matrix(amountofrows, amountofcolumns, copylist);
+		return copymatrix;
 	}
 }
